@@ -1,0 +1,58 @@
+spark-sql databricks:
+
+rdd1=sc.textFile('/FileStore/tables/sharemarket.csv')
+rdd2=rdd1.map(lambda x:x.split(','))
+
+df=rdd2.toDF(['MARKET','SERIES','SYMBOL','SECURITY','PREV_CL_PR','OPEN_PRICE','HIGH_PRICE','LOW_PRICE','CLOSE_PRICE','NET_TRDVAL','NET_TRDQTY','CORP_IND','TRADES','HI_52_WK','LO_52_WK'])
+
+df.show(5)
+
+df.createOrReplaceTempView("sharemarket")
+
+
+===============================================================
+
+1.	Query to display the number of series present in the data.
+
+>>spark.sql("select count(series) from sharemarket").show()
+
+2.	Display the series present in the data.
+
+>>spark.sql("select distinct(series) from sharemarket").show()
+
+3.	Find the sum of all the prices in the each series.
+
+>>spark.sql("select series,sum(prev_cl_pr),sum(open_price),sum(high_price),sum(low_price),sum(close_price) from sharemarket group  by series").show()
+
+4.	Display security,series with highest net trade value
+
+>>spark.sql("select security,series from sharemarket order by net_trdval desc limit 1").show()
+
+5.	Display the series whose sum of all prices greater than the net trade value.
+
+>>
+
+6.	Display the series with highest net trade quantity.
+
+>>spark.sql("select series from sharemarket where net_trdqty in (select max(net_trdqty) from sharemarket)").show()
+
+7.	 Display the highest and lowest open price
+
+>>spark.sql("select max(open_price),min(open_price) from sharemarket").show()
+
+8.	Query to display the series which have trades more than 80.
+
+>>spark.sql("select distinct(series) from sharemarket where net_trdqty>80").show()
+
+9.	Display the difference between the net trade value net trade quantity for each series.
+
+>>spark.sql("select series,sum(net_trdval)-sum(net_trdqty)as difference from sharemarket").show()
+
+
+
+
+
+
+
+
+
